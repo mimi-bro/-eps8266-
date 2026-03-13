@@ -547,81 +547,86 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const UID = "0d966db1618b45aca65141b03f4b8245";
-    const TOPIC = "switch006";
-    const TYPE = 1;
-    const POLL_INTERVAL_MS = 3000;
+    var UID = "0d966db1618b45aca65141b03f4b8245";
+    var TOPIC = "switch006";
+    var TYPE = 1;
+    var POLL_INTERVAL_MS = 3000;
 
-    const API_INFO = `https://apis.bemfa.com/vb/api/v2/topicInfo?openID=${UID}&topic=${TOPIC}&type=${TYPE}`;
-    const API_SEND = `https://apis.bemfa.com/va/sendMessage?uid=${UID}&topic=${TOPIC}&type=${TYPE}`;
+    var API_INFO = "https://apis.bemfa.com/vb/api/v2/topicInfo?openID=" + UID + "&topic=" + TOPIC + "&type=" + TYPE;
+    var API_SEND = "https://apis.bemfa.com/va/sendMessage?uid=" + UID + "&topic=" + TOPIC + "&type=" + TYPE;
 
-    let pollingTimer = null;
-    let sending = false;
-    let deferredPrompt = null;
-    let toastTimer = null;
-    let reloadedAfterControllerChange = false;
+    var pollingTimer = null;
+    var sending = false;
+    var deferredPrompt = null;
+    var toastTimer = null;
+    var reloadedAfterControllerChange = false;
 
     document.getElementById('meta-topic').innerText = TOPIC;
 
-    window.addEventListener('load', () => {
+    window.addEventListener('load', function () {
       registerServiceWorker();
       startPolling();
     });
 
-    window.addEventListener('beforeinstallprompt', (event) => {
+    window.addEventListener('beforeinstallprompt', function (event) {
       event.preventDefault();
       deferredPrompt = event;
       document.getElementById('btn-install').classList.remove('hidden');
-      document.getElementById('install-tip').innerText = '浏览器已支持安装，点“安装到桌面”即可像 App 一样使用。';
+      document.getElementById('install-tip').innerText = '???????????????????? App ?????';
     });
 
-    window.addEventListener('appinstalled', () => {
+    window.addEventListener('appinstalled', function () {
       deferredPrompt = null;
       document.getElementById('btn-install').classList.add('hidden');
-      document.getElementById('install-tip').innerText = '已安装到设备桌面，后面可以像普通 App 一样打开。';
-      showToast('控制页已安装到主屏幕');
+      document.getElementById('install-tip').innerText = '???????????????? App ?????';
+      showToast('??????????');
     });
 
-    document.getElementById('btn-install').addEventListener('click', async () => {
+    document.getElementById('btn-install').addEventListener('click', function () {
       if (!deferredPrompt) {
-        showToast('当前浏览器没有触发安装提示，请使用菜单里的“添加到主屏幕”');
+        showToast('?????????????????????????????');
         return;
       }
       deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      document.getElementById('btn-install').classList.add('hidden');
+      deferredPrompt.userChoice.then(function () {
+        deferredPrompt = null;
+        document.getElementById('btn-install').classList.add('hidden');
+      });
     });
 
-    document.getElementById('btn-share').addEventListener('click', async () => {
-      const url = window.location.href;
-      try {
-        await navigator.clipboard.writeText(url);
-        showToast('页面链接已复制');
-      } catch (_) {
+    document.getElementById('btn-share').addEventListener('click', function () {
+      var url = window.location.href;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () {
+          showToast('???????');
+        }).catch(function () {
+          showToast(url);
+        });
+      } else {
         showToast(url);
       }
     });
 
-    async function registerServiceWorker() {
+    function registerServiceWorker() {
       if (!('serviceWorker' in navigator)) return;
-      try {
-        const registration = await navigator.serviceWorker.register('./sw.js');
+      navigator.serviceWorker.register('./sw.js').then(function (registration) {
         registration.update();
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
           if (reloadedAfterControllerChange) return;
           reloadedAfterControllerChange = true;
           window.location.reload();
         });
-      } catch (error) {
-        console.error('Service Worker 注册失败', error);
-      }
+      }).catch(function (error) {
+        console.error('Service Worker ????', error);
+      });
     }
 
     function startPolling() {
       stopPolling();
       pollOnce(false);
-      pollingTimer = setInterval(() => pollOnce(false), POLL_INTERVAL_MS);
+      pollingTimer = setInterval(function () {
+        pollOnce(false);
+      }, POLL_INTERVAL_MS);
     }
 
     function stopPolling() {
@@ -632,11 +637,13 @@
     }
 
     function showToast(text) {
-      const toast = document.getElementById('toast');
+      var toast = document.getElementById('toast');
       toast.innerText = text;
       toast.classList.add('show');
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+      toastTimer = setTimeout(function () {
+        toast.classList.remove('show');
+      }, 2400);
     }
 
     function setBusy(flag) {
@@ -648,80 +655,90 @@
 
     function normalizeRelayState(msg) {
       if (typeof msg !== 'string') return null;
-      const value = msg.trim().toLowerCase();
-      if (["on", "1", "open"].includes(value)) return true;
-      if (["off", "0", "close"].includes(value)) return false;
+      var value = msg.trim().toLowerCase();
+      if (value === 'on' || value === '1' || value === 'open') return true;
+      if (value === 'off' || value === '0' || value === 'close') return false;
       return null;
     }
 
     function renderStatus(data) {
-      const online = data?.online === true;
-      const msg = typeof data?.msg === 'string' ? data.msg : '--';
-      const timeText = data?.time || '--';
-      const relay = normalizeRelayState(msg);
+      var online = !!(data && data.online === true);
+      var msg = (data && typeof data.msg === 'string') ? data.msg : '--';
+      var timeText = (data && data.time) ? data.time : '--';
+      var relay = normalizeRelayState(msg);
 
       document.getElementById('conn-lamp').classList.toggle('online', online);
-      document.getElementById('detail-online').innerText = online ? '在线' : '离线';
+      document.getElementById('detail-online').innerText = online ? '??' : '??';
       document.getElementById('detail-msg').innerText = msg || '--';
       document.getElementById('detail-time').innerText = timeText;
 
       if (relay === true) {
-        document.getElementById('relay-state').innerText = '已开启';
+        document.getElementById('relay-state').innerText = '???';
         document.getElementById('relay-state').className = 'relay-state on';
-        document.getElementById('conn-text').innerText = timeText ? `设备在线，最近上报 ON · ${timeText}` : '设备在线，最近上报 ON';
+        document.getElementById('conn-text').innerText = timeText !== '--' ? '????????? ON ? ' + timeText : '????????? ON';
       } else if (relay === false) {
-        document.getElementById('relay-state').innerText = '已关闭';
+        document.getElementById('relay-state').innerText = '???';
         document.getElementById('relay-state').className = 'relay-state off';
-        document.getElementById('conn-text').innerText = timeText ? `设备在线，最近上报 OFF · ${timeText}` : '设备在线，最近上报 OFF';
+        document.getElementById('conn-text').innerText = timeText !== '--' ? '????????? OFF ? ' + timeText : '????????? OFF';
       } else {
-        document.getElementById('relay-state').innerText = online ? '在线未识别' : '设备离线';
+        document.getElementById('relay-state').innerText = online ? '?????' : '????';
         document.getElementById('relay-state').className = 'relay-state off';
-        document.getElementById('conn-text').innerText = online ? `设备在线，但云端消息不是 on/off：${msg}` : '设备离线或暂无云端消息';
+        document.getElementById('conn-text').innerText = online ? '???????????? on/off?' + msg : '???????????';
       }
     }
 
-    async function pollOnce(showHint) {
-      try {
-        const response = await fetch(API_INFO, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const result = await response.json();
-        if (result.code !== 0 || !result.data) throw new Error(result.msg || '巴法云返回异常');
-
-        renderStatus(result.data);
-        if (showHint) showToast('状态已刷新');
-      } catch (error) {
-        console.error('状态拉取失败', error);
-        document.getElementById('conn-lamp').classList.remove('online');
-        document.getElementById('detail-online').innerText = '异常';
-        document.getElementById('relay-state').innerText = '接口异常';
-        document.getElementById('relay-state').className = 'relay-state off';
-        document.getElementById('conn-text').innerText = '无法读取巴法云状态，请检查网络、UID、Topic 或 type 参数。';
-        if (showHint) showToast('刷新失败，请看控制台错误');
-      }
+    function pollOnce(showHint) {
+      fetch(API_INFO, { cache: 'no-store' })
+        .then(function (response) {
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          return response.json();
+        })
+        .then(function (result) {
+          if (result.code !== 0 || !result.data) {
+            throw new Error(result.msg || '???????');
+          }
+          renderStatus(result.data);
+          if (showHint) showToast('?????');
+        })
+        .catch(function (error) {
+          console.error('??????', error);
+          document.getElementById('conn-lamp').classList.remove('online');
+          document.getElementById('detail-online').innerText = '??';
+          document.getElementById('relay-state').innerText = '????';
+          document.getElementById('relay-state').className = 'relay-state off';
+          document.getElementById('conn-text').innerText = '????????????????UID?Topic ? type ???';
+          if (showHint) showToast('????????????');
+        });
     }
 
-    async function sendCommand(cmd) {
+    function sendCommand(cmd) {
       if (sending) return;
       setBusy(true);
-      try {
-        const response = await fetch(`${API_SEND}&msg=${encodeURIComponent(cmd)}`, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const result = await response.json();
-        if (result.code !== 0) throw new Error(result.msg || '巴法云发送失败');
-
-        document.getElementById('last-action').innerText = `已发送命令：${cmd.toUpperCase()}，等待设备订阅 switch006 后执行。`;
-        showToast(`命令 ${cmd.toUpperCase()} 已发送`);
-        setTimeout(() => pollOnce(false), 700);
-      } catch (error) {
-        console.error('命令发送失败', error);
-        showToast('命令发送失败，请检查配置');
-      } finally {
-        setBusy(false);
-      }
+      fetch(API_SEND + '&msg=' + encodeURIComponent(cmd), { cache: 'no-store' })
+        .then(function (response) {
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          return response.json();
+        })
+        .then(function (result) {
+          if (result.code !== 0) {
+            throw new Error(result.msg || '???????');
+          }
+          document.getElementById('last-action').innerText = '??????' + cmd.toUpperCase() + '??????? switch006 ????';
+          showToast('?? ' + cmd.toUpperCase() + ' ???');
+          setTimeout(function () {
+            pollOnce(false);
+          }, 700);
+        })
+        .catch(function (error) {
+          console.error('??????', error);
+          showToast('????????????');
+        })
+        .then(function () {
+          setBusy(false);
+        });
     }
   </script>
 </body>
 </html>
+
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#b85c38">
+  <meta name="theme-color" content="#a84f2d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="继电器控制">
@@ -14,21 +14,23 @@
   <title>ESP-01S 继电器控制</title>
   <style>
     :root {
-      --bg: #f3ede2;
-      --panel: #fbf7ef;
-      --panel-strong: #efe5d6;
-      --ink: #2d241c;
-      --muted: #76685a;
-      --border: #b8a793;
-      --accent: #b85c38;
-      --accent-deep: #8e3f20;
+      --bg: #efe7da;
+      --panel: rgba(253, 249, 242, 0.9);
+      --panel-strong: #f8efe1;
+      --ink: #2e241d;
+      --muted: #75685c;
+      --border: rgba(126, 102, 82, 0.22);
+      --accent: #a84f2d;
+      --accent-deep: #7f371b;
       --ok: #2f7d54;
+      --ok-soft: rgba(47, 125, 84, 0.12);
       --off: #a33a32;
-      --shadow: 0 18px 42px rgba(74, 52, 34, 0.14);
+      --off-soft: rgba(163, 58, 50, 0.12);
+      --shadow: 0 18px 40px rgba(90, 63, 40, 0.12);
+      --radius: 24px;
     }
 
     * { box-sizing: border-box; }
-
     html { background: var(--bg); }
 
     body {
@@ -37,237 +39,209 @@
       font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at top left, rgba(184, 92, 56, 0.1), transparent 28%),
-        linear-gradient(180deg, #f8f3ea 0%, var(--bg) 100%);
-      padding: clamp(18px, 3vw, 36px);
+        radial-gradient(circle at top, rgba(168, 79, 45, 0.14), transparent 28%),
+        linear-gradient(180deg, #f7f1e7 0%, var(--bg) 100%);
+      padding: 14px 14px calc(24px + env(safe-area-inset-bottom));
     }
 
-    .shell { max-width: 920px; margin: 0 auto; }
-
-    .hero {
+    .shell {
+      max-width: 720px;
+      margin: 0 auto;
       display: grid;
-      grid-template-columns: 1.3fr 0.9fr;
-      gap: 22px;
-      align-items: stretch;
-    }
-
-    .panel {
-      background: color-mix(in srgb, var(--panel) 92%, white 8%);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
-
-    .hero-main {
-      padding: clamp(24px, 4vw, 40px);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-main::after {
-      content: "RELAY";
-      position: absolute;
-      right: 18px;
-      top: 14px;
-      font-size: clamp(44px, 8vw, 82px);
-      line-height: 1;
-      font-weight: 900;
-      letter-spacing: 0.12em;
-      color: rgba(184, 92, 56, 0.08);
-      pointer-events: none;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(184, 92, 56, 0.08);
-      color: var(--accent-deep);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-    }
-
-    .eyebrow::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 5px rgba(184, 92, 56, 0.16);
-    }
-
-    h1 {
-      margin: 18px 0 10px;
-      font-size: clamp(30px, 5vw, 50px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-    }
-
-    .subtitle {
-      margin: 0;
-      max-width: 52ch;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.7;
-    }
-
-    .meta-grid {
-      margin-top: 28px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .meta {
-      background: rgba(239, 229, 214, 0.72);
-      border: 1px solid rgba(184, 167, 147, 0.72);
-      border-radius: 16px;
-      padding: 14px 16px;
-      min-height: 94px;
-    }
-
-    .meta-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-
-    .meta-value {
-      font-size: clamp(18px, 2vw, 24px);
-      font-weight: 800;
-      word-break: break-all;
-    }
-
-    .hero-side {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      background: linear-gradient(180deg, #3c3026 0%, #2c241d 100%);
-      color: #f7efe1;
-      border-color: rgba(96, 72, 51, 0.8);
-    }
-
-    .status-card {
-      flex: 1;
-      border-radius: 20px;
-      background: rgba(255, 248, 237, 0.06);
-      border: 1px solid rgba(255, 244, 226, 0.12);
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
       gap: 14px;
     }
 
-    .status-top {
-      display: flex;
-      justify-content: space-between;
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .top-panel {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .top-panel::after {
+      content: "CTRL";
+      position: absolute;
+      right: 10px;
+      top: 2px;
+      font-size: clamp(38px, 13vw, 84px);
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      color: rgba(168, 79, 45, 0.07);
+      pointer-events: none;
+    }
+
+    .mini-badge {
+      display: inline-flex;
       align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(168, 79, 45, 0.1);
+      color: var(--accent-deep);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mini-badge::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(168, 79, 45, 0.14);
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      margin: 2px 0 6px;
+      font-size: clamp(28px, 9vw, 46px);
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 34em;
+    }
+
+    .state-strip {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
       gap: 12px;
     }
 
-    .status-title {
-      font-size: 13px;
+    .state-card,
+    .online-card {
+      border-radius: 22px;
+      padding: 16px;
+      min-height: 132px;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    .state-card {
+      background: linear-gradient(180deg, #2f261f 0%, #1f1914 100%);
+      color: #fff7ef;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .online-card {
+      background: linear-gradient(180deg, #fbf4e9 0%, #f3e7d6 100%);
+      color: var(--ink);
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .card-label {
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: rgba(247, 239, 225, 0.7);
-    }
-
-    .lamp {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.25);
-      box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.05);
-    }
-
-    .lamp.online {
-      background: #78d89e;
-      box-shadow: 0 0 0 6px rgba(120, 216, 158, 0.16), 0 0 16px rgba(120, 216, 158, 0.54);
+      letter-spacing: 0.08em;
+      opacity: 0.78;
     }
 
     .relay-state {
-      font-size: clamp(34px, 6vw, 58px);
+      font-size: clamp(38px, 10vw, 62px);
       line-height: 1;
       font-weight: 900;
-      letter-spacing: -0.05em;
+      letter-spacing: -0.06em;
     }
 
     .relay-state.on { color: #9af0b7; }
     .relay-state.off { color: #ffb2a7; }
 
+    .conn-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      width: fit-content;
+      border-radius: 999px;
+      background: rgba(46, 36, 29, 0.08);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .lamp {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #a79a8d;
+      box-shadow: 0 0 0 5px rgba(167, 154, 141, 0.16);
+    }
+
+    .lamp.online {
+      background: #2f7d54;
+      box-shadow: 0 0 0 5px rgba(47, 125, 84, 0.14), 0 0 16px rgba(47, 125, 84, 0.38);
+    }
+
     .status-note {
-      color: rgba(247, 239, 225, 0.78);
-      line-height: 1.7;
-      font-size: 14px;
+      font-size: 13px;
+      line-height: 1.65;
+      color: rgba(255, 247, 239, 0.82);
     }
 
-    .install-card {
-      margin-top: 22px;
-      padding: clamp(18px, 3vw, 28px);
+    .online-card .status-note {
+      color: var(--muted);
+    }
+
+    .action-panel {
+      padding: 16px;
       display: grid;
-      gap: 14px;
+      gap: 12px;
     }
 
-    .install-row {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 14px;
+    .action-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
     }
 
-    .install-box {
-      padding: 18px;
-      border-radius: 18px;
-      border: 1px dashed rgba(184, 92, 56, 0.3);
-      background: rgba(255, 251, 245, 0.72);
-    }
-
-    .install-box h2, .control-panel h2 {
-      margin: 0 0 10px;
-      font-size: clamp(24px, 3vw, 34px);
+    .action-head h2,
+    .stack h2 {
+      margin: 0;
+      font-size: 22px;
       letter-spacing: -0.04em;
     }
 
-    .install-box p {
+    .action-head p,
+    .stack p {
       margin: 0;
       color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .install-action {
-      display: grid;
-      gap: 12px;
-      align-content: start;
-    }
-
-    .control-panel {
-      margin-top: 22px;
-      padding: clamp(18px, 3vw, 28px);
-    }
-
-    .section-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    .section-head p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
+      line-height: 1.6;
     }
 
     .button-grid {
       display: grid;
-      grid-template-columns: 1.1fr 1.1fr 0.9fr;
-      gap: 14px;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
     button {
@@ -275,7 +249,7 @@
       border: 0;
       cursor: pointer;
       border-radius: 18px;
-      padding: 18px 16px;
+      padding: 16px 14px;
       font-size: 17px;
       font-weight: 800;
       transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
@@ -296,7 +270,13 @@
       box-shadow: 0 12px 24px rgba(163, 58, 50, 0.22);
     }
 
-    .btn-refresh, .btn-install {
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn-secondary {
       background: var(--panel-strong);
       color: var(--ink);
       border: 1px solid var(--border);
@@ -305,69 +285,139 @@
     .btn-install.primary {
       background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
       color: #fff7f2;
+      box-shadow: 0 12px 24px rgba(168, 79, 45, 0.22);
       border: 0;
-      box-shadow: 0 12px 24px rgba(184, 92, 56, 0.22);
     }
 
-    .details {
-      margin-top: 18px;
+    .metrics {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
     }
 
-    .detail {
-      min-height: 110px;
-      padding: 16px;
+    .metric {
       border-radius: 18px;
-      border: 1px dashed rgba(118, 104, 90, 0.34);
-      background: rgba(255, 251, 245, 0.72);
+      padding: 14px;
+      min-height: 96px;
+      background: rgba(255, 251, 245, 0.78);
+      border: 1px solid rgba(126, 102, 82, 0.16);
     }
 
-    .detail small {
+    .metric small {
       display: block;
-      color: var(--muted);
       margin-bottom: 10px;
-      text-transform: uppercase;
+      color: var(--muted);
+      font-size: 11px;
       letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
-    .detail strong {
+    .metric strong {
       display: block;
-      font-size: 20px;
-      line-height: 1.5;
+      font-size: 18px;
+      line-height: 1.45;
       word-break: break-word;
     }
 
-    .tip {
-      margin-top: 16px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: rgba(184, 92, 56, 0.08);
-      color: var(--accent-deep);
-      border: 1px solid rgba(184, 92, 56, 0.18);
+    .stack {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .install-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 12px;
+    }
+
+    .install-box,
+    .support-box {
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255, 251, 245, 0.72);
+      border: 1px dashed rgba(168, 79, 45, 0.22);
+    }
+
+    .support-box {
+      background: rgba(168, 79, 45, 0.08);
+      border-style: solid;
+    }
+
+    .support-box p,
+    .install-box p {
+      margin: 0;
+      color: var(--muted);
       line-height: 1.7;
       font-size: 14px;
+    }
+
+    .tip-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .docs {
+      border-radius: 18px;
+      background: rgba(248, 239, 225, 0.68);
+      border: 1px solid rgba(168, 79, 45, 0.18);
+      overflow: hidden;
+    }
+
+    .docs summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--accent-deep);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .docs summary::-webkit-details-marker { display: none; }
+
+    .docs summary::after {
+      content: "+";
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .docs[open] summary::after { content: "−"; }
+
+    .docs-body {
+      padding: 0 16px 16px;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 14px;
+      display: grid;
+      gap: 12px;
     }
 
     .hidden { display: none !important; }
 
     .toast {
       position: fixed;
-      right: 18px;
-      bottom: 18px;
+      left: 14px;
+      right: 14px;
+      bottom: calc(14px + env(safe-area-inset-bottom));
       background: rgba(45, 36, 28, 0.96);
       color: #fff8ef;
-      padding: 12px 16px;
-      border-radius: 14px;
+      padding: 12px 14px;
+      border-radius: 16px;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
       opacity: 0;
       transform: translateY(14px);
       pointer-events: none;
       transition: opacity 0.22s ease, transform 0.22s ease;
-      max-width: min(82vw, 360px);
       line-height: 1.6;
-      z-index: 9;
+      z-index: 20;
+      text-align: center;
+      font-size: 14px;
     }
 
     .toast.show {
@@ -379,116 +429,119 @@
       font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
       padding: 2px 6px;
       border-radius: 999px;
-      background: rgba(184, 92, 56, 0.12);
+      background: rgba(168, 79, 45, 0.12);
       color: var(--accent-deep);
     }
 
-    @media (max-width: 840px) {
-      .hero,
-      .install-row {
+    @media (min-width: 820px) {
+      body { padding: 22px; }
+      .action-panel,
+      .stack,
+      .top-panel { padding: 22px; }
+      .button-grid { grid-template-columns: 1.2fr 1.2fr; }
+    }
+
+    @media (max-width: 560px) {
+      .state-strip,
+      .install-grid,
+      .metrics,
+      .button-row,
+      .button-grid {
         grid-template-columns: 1fr;
       }
 
-      .button-grid,
-      .details,
-      .meta-grid {
-        grid-template-columns: 1fr;
+      .top-panel::after {
+        right: 8px;
+        top: 8px;
+      }
+
+      h1 {
+        max-width: 8ch;
       }
     }
   </style>
 </head>
 <body>
   <div class="shell">
-    <section class="hero">
-      <article class="panel hero-main">
-        <div class="eyebrow">PWA · GitHub Pages Ready</div>
-        <h1>ESP-01S 继电器<br>手机控制页</h1>
-        <p class="subtitle">
-          保留你现有巴法云控制逻辑，同时补成可安装的 PWA。手机浏览器打开后，可以“添加到主屏幕”，以后像 App 一样直接控制风扇继电器。
-        </p>
+    <section class="panel top-panel">
+      <div class="mini-badge">手机优先控制布局</div>
+      <div class="hero-copy">
+        <h1>风扇继电器控制</h1>
+        <p>把最常用的状态和开关按钮放到最上面，手机一打开就能看到当前状态并立即操作。</p>
+      </div>
 
-        <div class="meta-grid">
-          <div class="meta">
-            <div class="meta-label">Topic</div>
-            <div class="meta-value" id="meta-topic">switch006</div>
-          </div>
-          <div class="meta">
-            <div class="meta-label">Protocol</div>
-            <div class="meta-value">MQTT / type=1</div>
-          </div>
-          <div class="meta">
-            <div class="meta-label">Relay</div>
-            <div class="meta-value">GPIO0 低电平吸合</div>
-          </div>
-        </div>
-      </article>
-
-      <aside class="panel hero-side">
-        <div class="status-card">
-          <div class="status-top">
-            <div class="status-title">设备状态</div>
-            <div class="lamp" id="conn-lamp"></div>
-          </div>
+      <div class="state-strip">
+        <div class="state-card">
+          <div class="card-label">当前状态</div>
           <div class="relay-state off" id="relay-state">未同步</div>
-          <div class="status-note" id="conn-text">正在准备拉取巴法云状态…</div>
-        </div>
-
-        <div class="status-card">
-          <div class="status-title">最近动作</div>
           <div class="status-note" id="last-action">还没有发送控制命令。</div>
         </div>
-      </aside>
-    </section>
-
-    <section class="panel install-card">
-      <div class="install-row">
-        <div class="install-box">
-          <h2>安装到手机桌面</h2>
-          <p>
-            安卓 Chrome 打开后，会自动出现安装条件。若浏览器未弹出安装提示，也可以点击右上角菜单，选择“添加到主屏幕”或“安装应用”。
-          </p>
-        </div>
-        <div class="install-action">
-          <button class="btn-install primary hidden" id="btn-install">安装控制页</button>
-          <button class="btn-install" id="btn-share">复制当前页面链接</button>
-          <div class="tip" id="install-tip">安装按钮会在浏览器支持并满足安装条件时自动出现。</div>
+        <div class="online-card">
+          <div class="card-label">设备连接</div>
+          <div class="conn-pill"><span class="lamp" id="conn-lamp"></span><span id="detail-online">--</span></div>
+          <div class="status-note" id="conn-text">正在准备拉取巴法云状态…</div>
         </div>
       </div>
     </section>
 
-    <section class="panel control-panel">
-      <div class="section-head">
+    <section class="panel action-panel">
+      <div class="action-head">
         <div>
-          <h2>开关控制</h2>
-          <p>页面直接调用巴法云接口发送 <code>on</code> / <code>off</code>。</p>
+          <h2>快速控制</h2>
+          <p>连接成功后，点下面两个大按钮就能直接控制风扇。</p>
         </div>
       </div>
 
       <div class="button-grid">
-        <button class="btn-on" id="btn-on" onclick="sendCommand('on')">开启继电器</button>
-        <button class="btn-off" id="btn-off" onclick="sendCommand('off')">关闭继电器</button>
-        <button class="btn-refresh" id="btn-refresh" onclick="pollOnce(true)">立即刷新</button>
+        <button class="btn-on" id="btn-on" onclick="sendCommand('on')">开启风扇</button>
+        <button class="btn-off" id="btn-off" onclick="sendCommand('off')">关闭风扇</button>
       </div>
 
-      <div class="details">
-        <div class="detail">
-          <small>在线状态</small>
-          <strong id="detail-online">--</strong>
-        </div>
-        <div class="detail">
+      <div class="button-row">
+        <button class="btn-secondary" id="btn-refresh" onclick="pollOnce(true)">刷新状态</button>
+        <button class="btn-secondary hidden" id="btn-install">安装到桌面</button>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
           <small>云端消息</small>
           <strong id="detail-msg">--</strong>
         </div>
-        <div class="detail">
+        <div class="metric">
           <small>更新时间</small>
           <strong id="detail-time">--</strong>
         </div>
-      </div>
-
-      <div class="tip">
-        提醒：这个版本仍然把 UID 放在前端，只适合你自己用。上传到 GitHub Pages 后，建议别在公开页面里展示你的 UID。
+        <div class="metric">
+          <small>主题</small>
+          <strong id="meta-topic">switch006</strong>
+        </div>
       </div>
     </section>
+
+    <section class="panel stack">
+      <h2>安装与分享</h2>
+      <p>手机浏览器支持时，会显示安装按钮；不显示的话，也可以用浏览器菜单添加到主屏幕。</p>
+      <div class="install-grid">
+        <div class="install-box">
+          <p id="install-tip">安卓 Chrome 打开此页面后，若满足 PWA 安装条件，会自动出现“安装到桌面”按钮。</p>
+        </div>
+        <div class="support-box">
+          <button class="btn-secondary" id="btn-share" style="width:100%;">复制当前页面链接</button>
+        </div>
+      </div>
+    </section>
+
+    <details class="docs">
+      <summary>补充说明</summary>
+      <div class="docs-body">
+        <div>当前页面仍然通过巴法云 HTTP 接口向 <code>switch006</code> 发送 <code>on</code> / <code>off</code>，适配你已经烧录好的 ESP-01S 程序。</div>
+        <ul class="tip-list">
+          <li>当前前端仍包含巴法云 UID，建议只自己使用。</li>
+          <li>如果手机刷新后仍显示旧界面，先下拉刷新一次；若已安装到桌面，可彻底关闭后重新打开。</li>
+          <li>页面已做缓存升级处理，替换线上文件后通常刷新即可看到新版本。</li>
+        </ul>
+      </div>
+    </details>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -506,6 +559,7 @@
     let sending = false;
     let deferredPrompt = null;
     let toastTimer = null;
+    let reloadedAfterControllerChange = false;
 
     document.getElementById('meta-topic').innerText = TOPIC;
 
@@ -518,13 +572,13 @@
       event.preventDefault();
       deferredPrompt = event;
       document.getElementById('btn-install').classList.remove('hidden');
-      document.getElementById('install-tip').innerText = '浏览器已支持安装，点击“安装控制页”即可添加到主屏幕。';
+      document.getElementById('install-tip').innerText = '浏览器已支持安装，点“安装到桌面”即可像 App 一样使用。';
     });
 
     window.addEventListener('appinstalled', () => {
       deferredPrompt = null;
       document.getElementById('btn-install').classList.add('hidden');
-      document.getElementById('install-tip').innerText = '已安装到设备桌面，后面可像普通 App 一样打开。';
+      document.getElementById('install-tip').innerText = '已安装到设备桌面，后面可以像普通 App 一样打开。';
       showToast('控制页已安装到主屏幕');
     });
 
@@ -552,7 +606,13 @@
     async function registerServiceWorker() {
       if (!('serviceWorker' in navigator)) return;
       try {
-        await navigator.serviceWorker.register('./sw.js');
+        const registration = await navigator.serviceWorker.register('./sw.js');
+        registration.update();
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (reloadedAfterControllerChange) return;
+          reloadedAfterControllerChange = true;
+          window.location.reload();
+        });
       } catch (error) {
         console.error('Service Worker 注册失败', error);
       }
@@ -600,30 +660,23 @@
       const timeText = data?.time || '--';
       const relay = normalizeRelayState(msg);
 
-      const lamp = document.getElementById('conn-lamp');
-      const relayText = document.getElementById('relay-state');
-      const connText = document.getElementById('conn-text');
-      const detailOnline = document.getElementById('detail-online');
-      const detailMsg = document.getElementById('detail-msg');
-      const detailTime = document.getElementById('detail-time');
-
-      lamp.classList.toggle('online', online);
-      detailOnline.innerText = online ? '在线' : '离线';
-      detailMsg.innerText = msg || '--';
-      detailTime.innerText = timeText;
+      document.getElementById('conn-lamp').classList.toggle('online', online);
+      document.getElementById('detail-online').innerText = online ? '在线' : '离线';
+      document.getElementById('detail-msg').innerText = msg || '--';
+      document.getElementById('detail-time').innerText = timeText;
 
       if (relay === true) {
-        relayText.innerText = '已开启';
-        relayText.className = 'relay-state on';
-        connText.innerText = timeText ? `设备在线，最近一次上报为 ON · ${timeText}` : '设备在线，最近一次上报为 ON';
+        document.getElementById('relay-state').innerText = '已开启';
+        document.getElementById('relay-state').className = 'relay-state on';
+        document.getElementById('conn-text').innerText = timeText ? `设备在线，最近上报 ON · ${timeText}` : '设备在线，最近上报 ON';
       } else if (relay === false) {
-        relayText.innerText = '已关闭';
-        relayText.className = 'relay-state off';
-        connText.innerText = timeText ? `设备在线，最近一次上报为 OFF · ${timeText}` : '设备在线，最近一次上报为 OFF';
+        document.getElementById('relay-state').innerText = '已关闭';
+        document.getElementById('relay-state').className = 'relay-state off';
+        document.getElementById('conn-text').innerText = timeText ? `设备在线，最近上报 OFF · ${timeText}` : '设备在线，最近上报 OFF';
       } else {
-        relayText.innerText = online ? '在线未识别' : '设备离线';
-        relayText.className = 'relay-state off';
-        connText.innerText = online ? `设备在线，但云端消息不是 on/off：${msg}` : '设备离线或暂无云端消息';
+        document.getElementById('relay-state').innerText = online ? '在线未识别' : '设备离线';
+        document.getElementById('relay-state').className = 'relay-state off';
+        document.getElementById('conn-text').innerText = online ? `设备在线，但云端消息不是 on/off：${msg}` : '设备离线或暂无云端消息';
       }
     }
 
@@ -640,6 +693,7 @@
       } catch (error) {
         console.error('状态拉取失败', error);
         document.getElementById('conn-lamp').classList.remove('online');
+        document.getElementById('detail-online').innerText = '异常';
         document.getElementById('relay-state').innerText = '接口异常';
         document.getElementById('relay-state').className = 'relay-state off';
         document.getElementById('conn-text').innerText = '无法读取巴法云状态，请检查网络、UID、Topic 或 type 参数。';

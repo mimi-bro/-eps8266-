@@ -1,7 +1,7 @@
-﻿{
-  "name": "ESP-01S 继电器控制",
-  "short_name": "继电器控制",
-  "description": "基于巴法云的 ESP-01S 继电器手机控制页",
+{
+  "name": "\u7ee7\u7535\u5668\u63a7\u5236",
+  "short_name": "\u7ee7\u7535\u5668",
+  "description": "\u57fa\u4e8e\u5df4\u6cd5\u4e91\u7684 ESP-01S \u7ee7\u7535\u5668\u624b\u673a\u63a7\u5236\u9875",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -6,16 +6,16 @@
   <meta name="theme-color" content="#a84f2d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="继电器控制">
-  <meta name="description" content="基于巴法云的 ESP-01S 继电器手机控制页，可安装到手机桌面。">
+  <meta name="apple-mobile-web-app-title" content="&#32487;&#30005;&#22120;&#25511;&#21046;">
+  <meta name="description" content="&#22522;&#20110;&#24052;&#27861;&#20113;&#30340; ESP-01S &#32487;&#30005;&#22120;&#25163;&#26426;&#25511;&#21046;&#39029;&#38754;&#65292;&#21487;&#23433;&#35013;&#21040;&#25163;&#26426;&#26700;&#38754;&#12290;">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./assets/icon-192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
-  <title>ESP-01S 继电器控制</title>
+  <title>ESP-01S &#32487;&#30005;&#22120;&#25511;&#21046;</title>
   <style>
     :root {
       --bg: #efe7da;
-      --panel: rgba(253, 249, 242, 0.9);
+      --panel: rgba(253, 249, 242, 0.94);
       --panel-strong: #f8efe1;
       --ink: #2e241d;
       --muted: #75685c;
@@ -23,9 +23,7 @@
       --accent: #a84f2d;
       --accent-deep: #7f371b;
       --ok: #2f7d54;
-      --ok-soft: rgba(47, 125, 84, 0.12);
       --off: #a33a32;
-      --off-soft: rgba(163, 58, 50, 0.12);
       --shadow: 0 18px 40px rgba(90, 63, 40, 0.12);
       --radius: 24px;
     }
@@ -105,6 +103,17 @@
       box-shadow: 0 0 0 4px rgba(168, 79, 45, 0.14);
     }
 
+    .version {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(168, 79, 45, 0.14);
+      font-size: 11px;
+    }
+
     .hero-copy {
       position: relative;
       z-index: 1;
@@ -129,7 +138,7 @@
       position: relative;
       z-index: 1;
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
+      grid-template-columns: 1.15fr 0.85fr;
       gap: 12px;
     }
 
@@ -139,22 +148,19 @@
       padding: 16px;
       min-height: 132px;
       border: 1px solid rgba(255,255,255,0.25);
+      display: grid;
+      gap: 10px;
+      align-content: start;
     }
 
     .state-card {
       background: linear-gradient(180deg, #2f261f 0%, #1f1914 100%);
       color: #fff7ef;
-      display: grid;
-      gap: 10px;
-      align-content: start;
     }
 
     .online-card {
       background: linear-gradient(180deg, #fbf4e9 0%, #f3e7d6 100%);
       color: var(--ink);
-      display: grid;
-      gap: 10px;
-      align-content: start;
     }
 
     .card-label {
@@ -210,16 +216,19 @@
       color: var(--muted);
     }
 
-    .action-panel {
+    .action-panel,
+    .stack,
+    .docs {
       padding: 16px;
       display: grid;
       gap: 12px;
     }
 
-    .action-head {
+    .action-head,
+    .stack-head {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       gap: 10px;
     }
 
@@ -231,17 +240,31 @@
     }
 
     .action-head p,
-    .stack p {
+    .stack p,
+    .docs-body,
+    .support-copy {
       margin: 0;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.6;
     }
 
-    .button-grid {
+    .button-grid,
+    .button-row,
+    .install-grid,
+    .metrics {
       display: grid;
-      grid-template-columns: 1fr 1fr;
       gap: 10px;
+    }
+
+    .button-grid,
+    .button-row,
+    .metrics {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .metrics {
+      grid-template-columns: repeat(3, 1fr);
     }
 
     button {
@@ -270,12 +293,6 @@
       box-shadow: 0 12px 24px rgba(163, 58, 50, 0.22);
     }
 
-    .button-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
     .btn-secondary {
       background: var(--panel-strong);
       color: var(--ink);
@@ -287,12 +304,6 @@
       color: #fff7f2;
       box-shadow: 0 12px 24px rgba(168, 79, 45, 0.22);
       border: 0;
-    }
-
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
     }
 
     .metric {
@@ -319,144 +330,106 @@
       word-break: break-word;
     }
 
-    .stack {
-      padding: 16px;
-      display: grid;
-      gap: 12px;
-    }
-
     .install-grid {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 12px;
+      grid-template-columns: 1.3fr 0.7fr;
+      align-items: stretch;
     }
 
     .install-box,
     .support-box {
       border-radius: 18px;
-      padding: 16px;
-      background: rgba(255, 251, 245, 0.72);
-      border: 1px dashed rgba(168, 79, 45, 0.22);
-    }
-
-    .support-box {
-      background: rgba(168, 79, 45, 0.08);
-      border-style: solid;
-    }
-
-    .support-box p,
-    .install-box p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.7;
-      font-size: 14px;
-    }
-
-    .tip-list {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--muted);
-      line-height: 1.8;
-      font-size: 14px;
+      background: rgba(255, 251, 245, 0.78);
+      border: 1px solid rgba(126, 102, 82, 0.16);
+      padding: 14px;
     }
 
     .docs {
-      border-radius: 18px;
-      background: rgba(248, 239, 225, 0.68);
-      border: 1px solid rgba(168, 79, 45, 0.18);
-      overflow: hidden;
+      padding-top: 10px;
     }
 
     .docs summary {
       list-style: none;
       cursor: pointer;
-      padding: 16px;
-      font-size: 16px;
       font-weight: 800;
-      color: var(--accent-deep);
+      font-size: 16px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
     }
 
     .docs summary::-webkit-details-marker { display: none; }
-
-    .docs summary::after {
-      content: "+";
-      font-size: 20px;
-      line-height: 1;
-    }
-
-    .docs[open] summary::after { content: "−"; }
+    .docs summary::after { content: "+"; }
+    .docs[open] summary::after { content: "-"; }
 
     .docs-body {
-      padding: 0 16px 16px;
-      color: var(--muted);
-      line-height: 1.75;
-      font-size: 14px;
-      display: grid;
-      gap: 12px;
+      padding-top: 6px;
     }
 
-    .hidden { display: none !important; }
+    .tip-list {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    code {
+      padding: 2px 6px;
+      border-radius: 8px;
+      background: rgba(46, 36, 29, 0.08);
+      font-family: Consolas, monospace;
+      font-size: 12px;
+    }
 
     .toast {
       position: fixed;
-      left: 14px;
-      right: 14px;
-      bottom: calc(14px + env(safe-area-inset-bottom));
-      background: rgba(45, 36, 28, 0.96);
+      left: 50%;
+      bottom: calc(22px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(14px);
+      min-width: 180px;
+      max-width: calc(100vw - 32px);
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(33, 26, 20, 0.94);
       color: #fff8ef;
-      padding: 12px 14px;
-      border-radius: 16px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+      font-size: 13px;
+      text-align: center;
       opacity: 0;
-      transform: translateY(14px);
       pointer-events: none;
       transition: opacity 0.22s ease, transform 0.22s ease;
-      line-height: 1.6;
-      z-index: 20;
-      text-align: center;
-      font-size: 14px;
+      z-index: 30;
+      box-shadow: 0 14px 30px rgba(33, 26, 20, 0.2);
     }
 
     .toast.show {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateX(-50%) translateY(0);
     }
 
-    code {
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: rgba(168, 79, 45, 0.12);
-      color: var(--accent-deep);
-    }
+    .hidden { display: none !important; }
 
-    @media (min-width: 820px) {
-      body { padding: 22px; }
-      .action-panel,
-      .stack,
-      .top-panel { padding: 22px; }
-      .button-grid { grid-template-columns: 1.2fr 1.2fr; }
-    }
+    @media (max-width: 640px) {
+      body {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
 
-    @media (max-width: 560px) {
       .state-strip,
-      .install-grid,
-      .metrics,
+      .button-grid,
       .button-row,
-      .button-grid {
+      .install-grid,
+      .metrics {
         grid-template-columns: 1fr;
       }
 
-      .top-panel::after {
-        right: 8px;
-        top: 8px;
+      button {
+        min-height: 56px;
       }
 
-      h1 {
-        max-width: 8ch;
+      .metric {
+        min-height: 82px;
       }
     }
   </style>
@@ -464,22 +437,27 @@
 <body>
   <div class="shell">
     <section class="panel top-panel">
-      <div class="mini-badge">手机优先控制布局</div>
+      <div class="mini-badge">
+        <span>&#31227;&#21160;&#31471;&#24555;&#36895;&#25511;&#21046;</span>
+        <span class="version" id="badge-version">v6</span>
+      </div>
+
       <div class="hero-copy">
-        <h1>继电器控制系统</h1>
-        <p>把最常用的状态和开关按钮放到最上面，手机一打开就能看到当前状态并立即操作。</p>
+        <h1>&#32487;&#30005;&#22120;&#25511;&#21046;&#31995;&#32479;</h1>
+        <p>&#25226;&#29366;&#24577;&#12289;&#36830;&#25509;&#20449;&#24687;&#21644;&#25511;&#21046;&#25353;&#38062;&#37117;&#25918;&#22312;&#26368;&#19978;&#38754;&#65292;&#25163;&#26426;&#19968;&#25171;&#24320;&#23601;&#33021;&#30475;&#21040;&#24182;&#30452;&#25509;&#25805;&#20316;&#12290;</p>
       </div>
 
       <div class="state-strip">
         <div class="state-card">
-          <div class="card-label">当前状态</div>
-          <div class="relay-state off" id="relay-state">未同步</div>
-          <div class="status-note" id="last-action">还没有发送控制命令。</div>
+          <div class="card-label">&#24403;&#21069;&#29366;&#24577;</div>
+          <div class="relay-state off" id="relay-state">&#26410;&#21516;&#27493;</div>
+          <div class="status-note" id="last-action">&#36824;&#27809;&#26377;&#21457;&#36865;&#25511;&#21046;&#21629;&#20196;&#12290;</div>
         </div>
+
         <div class="online-card">
-          <div class="card-label">设备连接</div>
+          <div class="card-label">ESP &#36830;&#25509;</div>
           <div class="conn-pill"><span class="lamp" id="conn-lamp"></span><span id="detail-online">--</span></div>
-          <div class="status-note" id="conn-text">正在准备拉取巴法云状态…</div>
+          <div class="status-note" id="conn-text">&#27491;&#22312;&#20934;&#22791;&#25289;&#21462;&#24052;&#27861;&#20113;&#29366;&#24577;...</div>
         </div>
       </div>
     </section>
@@ -487,58 +465,65 @@
     <section class="panel action-panel">
       <div class="action-head">
         <div>
-          <h2>快速控制</h2>
-          <p>连接成功后，点下面两个大按钮就能直接控制继电器。</p>
+          <h2>&#24555;&#36895;&#25511;&#21046;</h2>
+          <p>&#36830;&#25509;&#25104;&#21151;&#21518;&#65292;&#28857;&#19979;&#38754;&#20004;&#20010;&#22823;&#25353;&#38062;&#23601;&#33021;&#30452;&#25509;&#25511;&#21046;&#32487;&#30005;&#22120;&#12290;</p>
         </div>
       </div>
 
       <div class="button-grid">
-        <button class="btn-on" id="btn-on" onclick="sendCommand('on')">开启继电器</button>
-        <button class="btn-off" id="btn-off" onclick="sendCommand('off')">关闭继电器</button>
+        <button class="btn-on" id="btn-on" onclick="sendCommand('on')">&#24320;&#21551;</button>
+        <button class="btn-off" id="btn-off" onclick="sendCommand('off')">&#20851;&#38381;</button>
       </div>
 
       <div class="button-row">
-        <button class="btn-secondary" id="btn-refresh" onclick="pollOnce(true)">刷新状态</button>
-        <button class="btn-secondary hidden" id="btn-install">安装到桌面</button>
+        <button class="btn-secondary" id="btn-refresh" onclick="pollOnce(true)">&#21047;&#26032;&#29366;&#24577;</button>
+        <button class="btn-secondary hidden btn-install" id="btn-install">&#23433;&#35013;&#21040;&#26700;&#38754;</button>
       </div>
 
       <div class="metrics">
         <div class="metric">
-          <small>云端消息</small>
+          <small>&#20113;&#31471;&#28040;&#24687;</small>
           <strong id="detail-msg">--</strong>
         </div>
         <div class="metric">
-          <small>更新时间</small>
+          <small>&#26356;&#26032;&#26102;&#38388;</small>
           <strong id="detail-time">--</strong>
         </div>
         <div class="metric">
-          <small>主题</small>
+          <small>Topic</small>
           <strong id="meta-topic">switch006</strong>
         </div>
       </div>
     </section>
 
     <section class="panel stack">
-      <h2>安装与分享</h2>
-      <p>手机浏览器支持时，会显示安装按钮；不显示的话，也可以用浏览器菜单添加到主屏幕。</p>
+      <div class="stack-head">
+        <div>
+          <h2>&#25163;&#26426;&#20351;&#29992;</h2>
+          <p>&#21487;&#20197;&#30452;&#25509;&#29992;&#27983;&#35272;&#22120;&#25171;&#24320;&#65292;&#20063;&#21487;&#20197;&#28155;&#21152;&#21040;&#20027;&#23631;&#24149;&#12290;</p>
+        </div>
+      </div>
+
       <div class="install-grid">
         <div class="install-box">
-          <p id="install-tip">安卓 Chrome 打开此页面后，若满足 PWA 安装条件，会自动出现“安装到桌面”按钮。</p>
+          <p id="install-tip">Android Chrome &#25110;&#20854;&#20182;&#25903;&#25345; PWA &#30340;&#27983;&#35272;&#22120;&#25171;&#24320;&#21518;&#65292;&#22914;&#26524;&#28385;&#36275;&#26465;&#20214;&#65292;&#39029;&#38754;&#20250;&#20986;&#29616;&#23433;&#35013;&#25353;&#38062;&#12290;</p>
         </div>
         <div class="support-box">
-          <button class="btn-secondary" id="btn-share" style="width:100%;">复制当前页面链接</button>
+          <div class="support-copy">&#22914;&#26524;&#38656;&#35201;&#20998;&#20139;&#32473;&#20854;&#20182;&#25163;&#26426;&#65292;&#21487;&#20197;&#30452;&#25509;&#22797;&#21046;&#24403;&#21069;&#38142;&#25509;&#12290;</div>
+          <div style="height:10px"></div>
+          <button class="btn-secondary" id="btn-share" style="width:100%;">&#22797;&#21046;&#24403;&#21069;&#39029;&#38754;&#38142;&#25509;</button>
         </div>
       </div>
     </section>
 
-    <details class="docs">
-      <summary>补充说明</summary>
+    <details class="panel docs">
+      <summary>&#34917;&#20805;&#35828;&#26126;</summary>
       <div class="docs-body">
-        <div>当前页面仍然通过巴法云 HTTP 接口向 <code>switch006</code> 发送 <code>on</code> / <code>off</code>，适配你已经烧录好的 ESP-01S 程序。</div>
+        <div>&#24403;&#21069;&#39029;&#38754;&#36890;&#36807;&#24052;&#27861;&#20113; HTTP &#25509;&#21475;&#21521; <code>switch006</code> &#21457;&#36865; <code>on</code> / <code>off</code>&#65292;&#36866;&#37197;&#20320;&#29616;&#22312;&#24050;&#32463;&#28903;&#24405;&#25104;&#21151;&#30340; ESP-01S &#31243;&#24207;&#12290;</div>
         <ul class="tip-list">
-          <li>当前前端仍包含巴法云 UID，建议只自己使用。</li>
-          <li>如果手机刷新后仍显示旧界面，先下拉刷新一次；若已安装到桌面，可彻底关闭后重新打开。</li>
-          <li>页面已做缓存升级处理，替换线上文件后通常刷新即可看到新版本。</li>
+          <li>&#25163;&#26426;&#22914;&#26524;&#19968;&#30452;&#26174;&#31034;&#26087;&#29256;&#39029;&#38754;&#65292;&#35831;&#20808;&#19979;&#25289;&#21047;&#26032;&#19968;&#27425;&#12290;</li>
+          <li>&#22914;&#26524;&#26159;&#20174;&#20027;&#23631;&#24149;&#25171;&#24320;&#30340; PWA&#65292;&#21487;&#20197;&#20808;&#23436;&#20840;&#20851;&#38381;&#20877;&#37325;&#26032;&#25171;&#24320;&#12290;</li>
+          <li>&#26412;&#29256;&#26412;&#24050;&#25913;&#20026;&#26080;&#32531;&#23384;&#25509;&#21475;&#35831;&#27714;&#65292;&#24182;&#20250;&#28165;&#29702;&#26087;&#30340; service worker &#32531;&#23384;&#12290;</li>
         </ul>
       </div>
     </details>
@@ -547,13 +532,12 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    var UID = "0d966db1618b45aca65141b03f4b8245";
-    var TOPIC = "switch006";
+    var APP_VERSION = 'v6';
+    var UID = '0d966db1618b45aca65141b03f4b8245';
+    var TOPIC = 'switch006';
     var TYPE = 1;
     var POLL_INTERVAL_MS = 3000;
-
-    var API_INFO = "https://apis.bemfa.com/vb/api/v2/topicInfo?openID=" + UID + "&topic=" + TOPIC + "&type=" + TYPE;
-    var API_SEND = "https://apis.bemfa.com/va/sendMessage?uid=" + UID + "&topic=" + TOPIC + "&type=" + TYPE;
+    var REQUEST_TIMEOUT_MS = 10000;
 
     var pollingTimer = null;
     var sending = false;
@@ -561,64 +545,137 @@
     var toastTimer = null;
     var reloadedAfterControllerChange = false;
 
-    document.getElementById('meta-topic').innerText = TOPIC;
+    function byId(id) {
+      return document.getElementById(id);
+    }
 
-    window.addEventListener('load', function () {
-      registerServiceWorker();
-      startPolling();
-    });
+    function buildInfoUrl() {
+      return 'https://apis.bemfa.com/vb/api/v2/topicInfo?openID=' + encodeURIComponent(UID) + '&topic=' + encodeURIComponent(TOPIC) + '&type=' + TYPE + '&_t=' + Date.now();
+    }
 
-    window.addEventListener('beforeinstallprompt', function (event) {
-      event.preventDefault();
-      deferredPrompt = event;
-      document.getElementById('btn-install').classList.remove('hidden');
-      document.getElementById('install-tip').innerText = '???????????????????? App ?????';
-    });
+    function buildSendUrl(cmd) {
+      return 'https://apis.bemfa.com/va/sendMessage?uid=' + encodeURIComponent(UID) + '&topic=' + encodeURIComponent(TOPIC) + '&type=' + TYPE + '&msg=' + encodeURIComponent(cmd) + '&_t=' + Date.now();
+    }
 
-    window.addEventListener('appinstalled', function () {
-      deferredPrompt = null;
-      document.getElementById('btn-install').classList.add('hidden');
-      document.getElementById('install-tip').innerText = '???????????????? App ?????';
-      showToast('??????????');
-    });
+    function fetchJson(url, timeoutMs) {
+      var ms = timeoutMs || REQUEST_TIMEOUT_MS;
+      var request = fetch(url, {
+        method: 'GET',
+        cache: 'no-store',
+        mode: 'cors'
+      }).then(function (response) {
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
+        return response.json();
+      });
 
-    document.getElementById('btn-install').addEventListener('click', function () {
-      if (!deferredPrompt) {
-        showToast('?????????????????????????????');
+      var timeout = new Promise(function (_, reject) {
+        setTimeout(function () {
+          reject(new Error('Timeout'));
+        }, ms);
+      });
+
+      return Promise.race([request, timeout]);
+    }
+
+    function normalizeRelayState(msg) {
+      if (typeof msg !== 'string') return null;
+      var value = msg.trim().toLowerCase();
+      if (value === 'on' || value === '1' || value === 'open') return true;
+      if (value === 'off' || value === '0' || value === 'close') return false;
+      return null;
+    }
+
+    function showToast(text) {
+      var toast = byId('toast');
+      toast.innerText = text;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () {
+        toast.classList.remove('show');
+      }, 2400);
+    }
+
+    function setBusy(flag) {
+      sending = flag;
+      byId('btn-on').disabled = flag;
+      byId('btn-off').disabled = flag;
+      byId('btn-refresh').disabled = flag;
+    }
+
+    function renderStatus(data) {
+      var online = !!(data && data.online === true);
+      var msg = (data && typeof data.msg === 'string') ? data.msg : '--';
+      var timeText = (data && data.time) ? data.time : '--';
+      var relay = normalizeRelayState(msg);
+
+      byId('conn-lamp').classList.toggle('online', online);
+      byId('detail-online').innerText = online ? '\u5728\u7ebf' : '\u79bb\u7ebf';
+      byId('detail-msg').innerText = msg || '--';
+      byId('detail-time').innerText = timeText;
+
+      if (relay === true) {
+        byId('relay-state').innerText = '\u5df2\u5f00\u542f';
+        byId('relay-state').className = 'relay-state on';
+        byId('conn-text').innerText = online
+          ? '\u8bbe\u5907\u5728\u7ebf\uff0c\u5f53\u524d\u53ef\u6b63\u5e38\u63a5\u6536\u6307\u4ee4\u3002'
+          : '\u4e91\u7aef\u8bb0\u5f55\u4e3a\u5f00\u542f\uff0c\u4f46 ESP \u5f53\u524d\u4e0d\u5728\u7ebf\u3002';
+        byId('last-action').innerText = timeText !== '--'
+          ? '\u6700\u540e\u540c\u6b65\u5230\u5f00\u542f\u72b6\u6001\uff0c\u65f6\u95f4 ' + timeText
+          : '\u4e91\u7aef\u5f53\u524d\u72b6\u6001\u4e3a ON\u3002';
         return;
       }
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function () {
-        deferredPrompt = null;
-        document.getElementById('btn-install').classList.add('hidden');
-      });
-    });
 
-    document.getElementById('btn-share').addEventListener('click', function () {
-      var url = window.location.href;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(function () {
-          showToast('???????');
-        }).catch(function () {
-          showToast(url);
-        });
-      } else {
-        showToast(url);
+      if (relay === false) {
+        byId('relay-state').innerText = '\u5df2\u5173\u95ed';
+        byId('relay-state').className = 'relay-state off';
+        byId('conn-text').innerText = online
+          ? '\u8bbe\u5907\u5728\u7ebf\uff0c\u5f53\u524d\u7ee7\u7535\u5668\u4e3a\u5173\u95ed\u72b6\u6001\u3002'
+          : '\u4e91\u7aef\u8bb0\u5f55\u4e3a\u5173\u95ed\uff0c\u4f46 ESP \u5f53\u524d\u4e0d\u5728\u7ebf\u3002';
+        byId('last-action').innerText = timeText !== '--'
+          ? '\u6700\u540e\u540c\u6b65\u5230\u5173\u95ed\u72b6\u6001\uff0c\u65f6\u95f4 ' + timeText
+          : '\u4e91\u7aef\u5f53\u524d\u72b6\u6001\u4e3a OFF\u3002';
+        return;
       }
-    });
 
-    function registerServiceWorker() {
-      if (!('serviceWorker' in navigator)) return;
-      navigator.serviceWorker.register('./sw.js').then(function (registration) {
-        registration.update();
-        navigator.serviceWorker.addEventListener('controllerchange', function () {
-          if (reloadedAfterControllerChange) return;
-          reloadedAfterControllerChange = true;
-          window.location.reload();
+      byId('relay-state').innerText = online ? '\u672a\u8bc6\u522b' : '\u672a\u8fde\u63a5';
+      byId('relay-state').className = 'relay-state off';
+      byId('conn-text').innerText = online
+        ? '\u5df2\u8fde\u4e0a\u8bbe\u5907\uff0c\u4f46\u4e91\u7aef\u6d88\u606f\u4e0d\u662f on/off\uff1a' + msg
+        : '\u8bf7\u68c0\u67e5 ESP \u4f9b\u7535\u3001Wi-Fi \u6216\u5df4\u6cd5\u4e91\u8fde\u63a5\u3002';
+      byId('last-action').innerText = '\u4e91\u7aef\u72b6\u6001\u5b57\u6bb5\u4e3a\uff1a' + msg;
+    }
+
+    function renderError(error, showHint) {
+      console.error('Bemfa request failed:', error);
+      byId('conn-lamp').classList.remove('online');
+      byId('detail-online').innerText = '\u5f02\u5e38';
+      byId('detail-msg').innerText = '--';
+      byId('detail-time').innerText = '--';
+      byId('relay-state').innerText = '\u5f02\u5e38';
+      byId('relay-state').className = 'relay-state off';
+      byId('conn-text').innerText = '\u63a5\u53e3\u72b6\u6001\u5f02\u5e38\uff0c\u8bf7\u68c0\u67e5\u624b\u673a\u7f51\u7edc\u3001UID\u3001Topic \u6216\u5237\u65b0\u7f13\u5b58\u3002';
+      byId('last-action').innerText = '\u6700\u8fd1\u4e00\u6b21\u67e5\u8be2\u5931\u8d25\uff1a' + ((error && error.message) ? error.message : '\u672a\u77e5\u9519\u8bef');
+      if (showHint) {
+        showToast('\u63a5\u53e3\u72b6\u6001\u5f02\u5e38');
+      }
+    }
+
+    function pollOnce(showHint) {
+      return fetchJson(buildInfoUrl(), REQUEST_TIMEOUT_MS)
+        .then(function (result) {
+          if (result.code !== 0 || !result.data) {
+            throw new Error(result.msg || '\u63a5\u53e3\u8fd4\u56de\u5f02\u5e38');
+          }
+          renderStatus(result.data);
+          if (showHint) {
+            showToast('\u72b6\u6001\u5df2\u66f4\u65b0');
+          }
+        })
+        .catch(function (error) {
+          renderError(error, showHint);
         });
-      }).catch(function (error) {
-        console.error('Service Worker ????', error);
-      });
     }
 
     function startPolling() {
@@ -636,109 +693,129 @@
       }
     }
 
-    function showToast(text) {
-      var toast = document.getElementById('toast');
-      toast.innerText = text;
-      toast.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(function () {
-        toast.classList.remove('show');
-      }, 2400);
-    }
-
-    function setBusy(flag) {
-      sending = flag;
-      document.getElementById('btn-on').disabled = flag;
-      document.getElementById('btn-off').disabled = flag;
-      document.getElementById('btn-refresh').disabled = flag;
-    }
-
-    function normalizeRelayState(msg) {
-      if (typeof msg !== 'string') return null;
-      var value = msg.trim().toLowerCase();
-      if (value === 'on' || value === '1' || value === 'open') return true;
-      if (value === 'off' || value === '0' || value === 'close') return false;
-      return null;
-    }
-
-    function renderStatus(data) {
-      var online = !!(data && data.online === true);
-      var msg = (data && typeof data.msg === 'string') ? data.msg : '--';
-      var timeText = (data && data.time) ? data.time : '--';
-      var relay = normalizeRelayState(msg);
-
-      document.getElementById('conn-lamp').classList.toggle('online', online);
-      document.getElementById('detail-online').innerText = online ? '??' : '??';
-      document.getElementById('detail-msg').innerText = msg || '--';
-      document.getElementById('detail-time').innerText = timeText;
-
-      if (relay === true) {
-        document.getElementById('relay-state').innerText = '???';
-        document.getElementById('relay-state').className = 'relay-state on';
-        document.getElementById('conn-text').innerText = timeText !== '--' ? '????????? ON ? ' + timeText : '????????? ON';
-      } else if (relay === false) {
-        document.getElementById('relay-state').innerText = '???';
-        document.getElementById('relay-state').className = 'relay-state off';
-        document.getElementById('conn-text').innerText = timeText !== '--' ? '????????? OFF ? ' + timeText : '????????? OFF';
-      } else {
-        document.getElementById('relay-state').innerText = online ? '?????' : '????';
-        document.getElementById('relay-state').className = 'relay-state off';
-        document.getElementById('conn-text').innerText = online ? '???????????? on/off?' + msg : '???????????';
-      }
-    }
-
-    function pollOnce(showHint) {
-      fetch(API_INFO, { cache: 'no-store' })
-        .then(function (response) {
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          return response.json();
-        })
-        .then(function (result) {
-          if (result.code !== 0 || !result.data) {
-            throw new Error(result.msg || '???????');
-          }
-          renderStatus(result.data);
-          if (showHint) showToast('?????');
-        })
-        .catch(function (error) {
-          console.error('??????', error);
-          document.getElementById('conn-lamp').classList.remove('online');
-          document.getElementById('detail-online').innerText = '??';
-          document.getElementById('relay-state').innerText = '????';
-          document.getElementById('relay-state').className = 'relay-state off';
-          document.getElementById('conn-text').innerText = '????????????????UID?Topic ? type ???';
-          if (showHint) showToast('????????????');
-        });
-    }
-
     function sendCommand(cmd) {
       if (sending) return;
       setBusy(true);
-      fetch(API_SEND + '&msg=' + encodeURIComponent(cmd), { cache: 'no-store' })
-        .then(function (response) {
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          return response.json();
-        })
+
+      fetchJson(buildSendUrl(cmd), REQUEST_TIMEOUT_MS)
         .then(function (result) {
           if (result.code !== 0) {
-            throw new Error(result.msg || '???????');
+            throw new Error(result.msg || '\u6307\u4ee4\u53d1\u9001\u5931\u8d25');
           }
-          document.getElementById('last-action').innerText = '??????' + cmd.toUpperCase() + '??????? switch006 ????';
-          showToast('?? ' + cmd.toUpperCase() + ' ???');
+          byId('last-action').innerText = '\u5df2\u53d1\u9001 ' + cmd.toUpperCase() + ' \u6307\u4ee4\uff0c\u6b63\u5728\u7b49\u5f85\u4e91\u7aef\u540c\u6b65\u3002';
+          showToast(cmd === 'on' ? '\u5df2\u53d1\u9001\u5f00\u542f\u6307\u4ee4' : '\u5df2\u53d1\u9001\u5173\u95ed\u6307\u4ee4');
           setTimeout(function () {
             pollOnce(false);
-          }, 700);
+          }, 900);
         })
         .catch(function (error) {
-          console.error('??????', error);
-          showToast('????????????');
+          console.error('Bemfa send failed:', error);
+          byId('last-action').innerText = '\u63a7\u5236\u53d1\u9001\u5931\u8d25\uff1a' + ((error && error.message) ? error.message : '\u672a\u77e5\u9519\u8bef');
+          showToast('\u53d1\u9001\u5931\u8d25');
         })
         .then(function () {
           setBusy(false);
         });
     }
+
+    function clearLegacyCaches() {
+      if (!('caches' in window)) {
+        return Promise.resolve();
+      }
+
+      return caches.keys().then(function (keys) {
+        var targets = keys.filter(function (key) {
+          return /^relay-pwa-/i.test(key);
+        });
+        return Promise.all(targets.map(function (key) {
+          return caches.delete(key);
+        }));
+      }).catch(function () {
+        return Promise.resolve();
+      });
+    }
+
+    function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) {
+        return;
+      }
+
+      navigator.serviceWorker.register('./sw.js').then(function (registration) {
+        registration.update();
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (reloadedAfterControllerChange) {
+            return;
+          }
+          reloadedAfterControllerChange = true;
+          window.location.reload();
+        });
+      }).catch(function (error) {
+        console.error('Service worker register failed:', error);
+      });
+    }
+
+    function bindInstallEvents() {
+      window.addEventListener('beforeinstallprompt', function (event) {
+        event.preventDefault();
+        deferredPrompt = event;
+        byId('btn-install').classList.remove('hidden');
+        byId('install-tip').innerText = '\u53ef\u4ee5\u5b89\u88c5\u5230\u624b\u673a\u684c\u9762\uff0c\u4e4b\u540e\u53ef\u4ee5\u50cf App \u4e00\u6837\u76f4\u63a5\u6253\u5f00\u3002';
+      });
+
+      window.addEventListener('appinstalled', function () {
+        deferredPrompt = null;
+        byId('btn-install').classList.add('hidden');
+        byId('install-tip').innerText = '\u5df2\u5b89\u88c5\u5230\u4e3b\u5c4f\u5e55\uff0c\u4e0b\u6b21\u53ef\u76f4\u63a5\u4ece\u684c\u9762\u6253\u5f00\u3002';
+        showToast('\u5df2\u5b8c\u6210\u5b89\u88c5');
+      });
+
+      byId('btn-install').addEventListener('click', function () {
+        if (!deferredPrompt) {
+          showToast('\u8bf7\u7528\u6d4f\u89c8\u5668\u83dc\u5355\u6dfb\u52a0\u5230\u4e3b\u5c4f\u5e55');
+          return;
+        }
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function () {
+          deferredPrompt = null;
+          byId('btn-install').classList.add('hidden');
+        }, function () {
+          deferredPrompt = null;
+          byId('btn-install').classList.add('hidden');
+        });
+      });
+    }
+
+    function bindShareEvents() {
+      byId('btn-share').addEventListener('click', function () {
+        var url = window.location.href;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function () {
+            showToast('\u94fe\u63a5\u5df2\u590d\u5236');
+          }).catch(function () {
+            showToast(url);
+          });
+          return;
+        }
+        showToast(url);
+      });
+    }
+
+    window.addEventListener('load', function () {
+      byId('meta-topic').innerText = TOPIC;
+      byId('badge-version').innerText = APP_VERSION;
+      document.title = 'ESP-01S \u7ee7\u7535\u5668\u63a7\u5236 ' + APP_VERSION;
+      clearLegacyCaches().then(function () {
+        registerServiceWorker();
+        bindInstallEvents();
+        bindShareEvents();
+        startPolling();
+      }, function () {
+        registerServiceWorker();
+        bindInstallEvents();
+        bindShareEvents();
+        startPolling();
+      });
+    });
   </script>
 </body>
 </html>
-
-

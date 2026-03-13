@@ -1,0 +1,672 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#b85c38">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="继电器控制">
+  <meta name="description" content="基于巴法云的 ESP-01S 继电器手机控制页，可安装到手机桌面。">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/icon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
+  <title>ESP-01S 继电器控制</title>
+  <style>
+    :root {
+      --bg: #f3ede2;
+      --panel: #fbf7ef;
+      --panel-strong: #efe5d6;
+      --ink: #2d241c;
+      --muted: #76685a;
+      --border: #b8a793;
+      --accent: #b85c38;
+      --accent-deep: #8e3f20;
+      --ok: #2f7d54;
+      --off: #a33a32;
+      --shadow: 0 18px 42px rgba(74, 52, 34, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--bg); }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(184, 92, 56, 0.1), transparent 28%),
+        linear-gradient(180deg, #f8f3ea 0%, var(--bg) 100%);
+      padding: clamp(18px, 3vw, 36px);
+    }
+
+    .shell { max-width: 920px; margin: 0 auto; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: color-mix(in srgb, var(--panel) 92%, white 8%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-main {
+      padding: clamp(24px, 4vw, 40px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "RELAY";
+      position: absolute;
+      right: 18px;
+      top: 14px;
+      font-size: clamp(44px, 8vw, 82px);
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: rgba(184, 92, 56, 0.08);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(184, 92, 56, 0.08);
+      color: var(--accent-deep);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(184, 92, 56, 0.16);
+    }
+
+    h1 {
+      margin: 18px 0 10px;
+      font-size: clamp(30px, 5vw, 50px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 52ch;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .meta-grid {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .meta {
+      background: rgba(239, 229, 214, 0.72);
+      border: 1px solid rgba(184, 167, 147, 0.72);
+      border-radius: 16px;
+      padding: 14px 16px;
+      min-height: 94px;
+    }
+
+    .meta-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .meta-value {
+      font-size: clamp(18px, 2vw, 24px);
+      font-weight: 800;
+      word-break: break-all;
+    }
+
+    .hero-side {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: linear-gradient(180deg, #3c3026 0%, #2c241d 100%);
+      color: #f7efe1;
+      border-color: rgba(96, 72, 51, 0.8);
+    }
+
+    .status-card {
+      flex: 1;
+      border-radius: 20px;
+      background: rgba(255, 248, 237, 0.06);
+      border: 1px solid rgba(255, 244, 226, 0.12);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .status-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: rgba(247, 239, 225, 0.7);
+    }
+
+    .lamp {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.05);
+    }
+
+    .lamp.online {
+      background: #78d89e;
+      box-shadow: 0 0 0 6px rgba(120, 216, 158, 0.16), 0 0 16px rgba(120, 216, 158, 0.54);
+    }
+
+    .relay-state {
+      font-size: clamp(34px, 6vw, 58px);
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+    }
+
+    .relay-state.on { color: #9af0b7; }
+    .relay-state.off { color: #ffb2a7; }
+
+    .status-note {
+      color: rgba(247, 239, 225, 0.78);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .install-card {
+      margin-top: 22px;
+      padding: clamp(18px, 3vw, 28px);
+      display: grid;
+      gap: 14px;
+    }
+
+    .install-row {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 14px;
+    }
+
+    .install-box {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px dashed rgba(184, 92, 56, 0.3);
+      background: rgba(255, 251, 245, 0.72);
+    }
+
+    .install-box h2, .control-panel h2 {
+      margin: 0 0 10px;
+      font-size: clamp(24px, 3vw, 34px);
+      letter-spacing: -0.04em;
+    }
+
+    .install-box p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .install-action {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .control-panel {
+      margin-top: 22px;
+      padding: clamp(18px, 3vw, 28px);
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1.1fr 0.9fr;
+      gap: 14px;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      border-radius: 18px;
+      padding: 18px 16px;
+      font-size: 17px;
+      font-weight: 800;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { cursor: wait; opacity: 0.55; transform: none; }
+
+    .btn-on {
+      background: var(--ok);
+      color: #f5fff8;
+      box-shadow: 0 12px 24px rgba(47, 125, 84, 0.22);
+    }
+
+    .btn-off {
+      background: var(--off);
+      color: #fff6f4;
+      box-shadow: 0 12px 24px rgba(163, 58, 50, 0.22);
+    }
+
+    .btn-refresh, .btn-install {
+      background: var(--panel-strong);
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+
+    .btn-install.primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+      color: #fff7f2;
+      border: 0;
+      box-shadow: 0 12px 24px rgba(184, 92, 56, 0.22);
+    }
+
+    .details {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .detail {
+      min-height: 110px;
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px dashed rgba(118, 104, 90, 0.34);
+      background: rgba(255, 251, 245, 0.72);
+    }
+
+    .detail small {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .detail strong {
+      display: block;
+      font-size: 20px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .tip {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(184, 92, 56, 0.08);
+      color: var(--accent-deep);
+      border: 1px solid rgba(184, 92, 56, 0.18);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .hidden { display: none !important; }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: rgba(45, 36, 28, 0.96);
+      color: #fff8ef;
+      padding: 12px 16px;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+      opacity: 0;
+      transform: translateY(14px);
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      max-width: min(82vw, 360px);
+      line-height: 1.6;
+      z-index: 9;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(184, 92, 56, 0.12);
+      color: var(--accent-deep);
+    }
+
+    @media (max-width: 840px) {
+      .hero,
+      .install-row {
+        grid-template-columns: 1fr;
+      }
+
+      .button-grid,
+      .details,
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <article class="panel hero-main">
+        <div class="eyebrow">PWA · GitHub Pages Ready</div>
+        <h1>ESP-01S 继电器<br>手机控制页</h1>
+        <p class="subtitle">
+          保留你现有巴法云控制逻辑，同时补成可安装的 PWA。手机浏览器打开后，可以“添加到主屏幕”，以后像 App 一样直接控制风扇继电器。
+        </p>
+
+        <div class="meta-grid">
+          <div class="meta">
+            <div class="meta-label">Topic</div>
+            <div class="meta-value" id="meta-topic">switch006</div>
+          </div>
+          <div class="meta">
+            <div class="meta-label">Protocol</div>
+            <div class="meta-value">MQTT / type=1</div>
+          </div>
+          <div class="meta">
+            <div class="meta-label">Relay</div>
+            <div class="meta-value">GPIO0 低电平吸合</div>
+          </div>
+        </div>
+      </article>
+
+      <aside class="panel hero-side">
+        <div class="status-card">
+          <div class="status-top">
+            <div class="status-title">设备状态</div>
+            <div class="lamp" id="conn-lamp"></div>
+          </div>
+          <div class="relay-state off" id="relay-state">未同步</div>
+          <div class="status-note" id="conn-text">正在准备拉取巴法云状态…</div>
+        </div>
+
+        <div class="status-card">
+          <div class="status-title">最近动作</div>
+          <div class="status-note" id="last-action">还没有发送控制命令。</div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel install-card">
+      <div class="install-row">
+        <div class="install-box">
+          <h2>安装到手机桌面</h2>
+          <p>
+            安卓 Chrome 打开后，会自动出现安装条件。若浏览器未弹出安装提示，也可以点击右上角菜单，选择“添加到主屏幕”或“安装应用”。
+          </p>
+        </div>
+        <div class="install-action">
+          <button class="btn-install primary hidden" id="btn-install">安装控制页</button>
+          <button class="btn-install" id="btn-share">复制当前页面链接</button>
+          <div class="tip" id="install-tip">安装按钮会在浏览器支持并满足安装条件时自动出现。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel control-panel">
+      <div class="section-head">
+        <div>
+          <h2>开关控制</h2>
+          <p>页面直接调用巴法云接口发送 <code>on</code> / <code>off</code>。</p>
+        </div>
+      </div>
+
+      <div class="button-grid">
+        <button class="btn-on" id="btn-on" onclick="sendCommand('on')">开启继电器</button>
+        <button class="btn-off" id="btn-off" onclick="sendCommand('off')">关闭继电器</button>
+        <button class="btn-refresh" id="btn-refresh" onclick="pollOnce(true)">立即刷新</button>
+      </div>
+
+      <div class="details">
+        <div class="detail">
+          <small>在线状态</small>
+          <strong id="detail-online">--</strong>
+        </div>
+        <div class="detail">
+          <small>云端消息</small>
+          <strong id="detail-msg">--</strong>
+        </div>
+        <div class="detail">
+          <small>更新时间</small>
+          <strong id="detail-time">--</strong>
+        </div>
+      </div>
+
+      <div class="tip">
+        提醒：这个版本仍然把 UID 放在前端，只适合你自己用。上传到 GitHub Pages 后，建议别在公开页面里展示你的 UID。
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const UID = "0d966db1618b45aca65141b03f4b8245";
+    const TOPIC = "switch006";
+    const TYPE = 1;
+    const POLL_INTERVAL_MS = 3000;
+
+    const API_INFO = `https://apis.bemfa.com/vb/api/v2/topicInfo?openID=${UID}&topic=${TOPIC}&type=${TYPE}`;
+    const API_SEND = `https://apis.bemfa.com/va/sendMessage?uid=${UID}&topic=${TOPIC}&type=${TYPE}`;
+
+    let pollingTimer = null;
+    let sending = false;
+    let deferredPrompt = null;
+    let toastTimer = null;
+
+    document.getElementById('meta-topic').innerText = TOPIC;
+
+    window.addEventListener('load', () => {
+      registerServiceWorker();
+      startPolling();
+    });
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      document.getElementById('btn-install').classList.remove('hidden');
+      document.getElementById('install-tip').innerText = '浏览器已支持安装，点击“安装控制页”即可添加到主屏幕。';
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      document.getElementById('btn-install').classList.add('hidden');
+      document.getElementById('install-tip').innerText = '已安装到设备桌面，后面可像普通 App 一样打开。';
+      showToast('控制页已安装到主屏幕');
+    });
+
+    document.getElementById('btn-install').addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        showToast('当前浏览器没有触发安装提示，请使用菜单里的“添加到主屏幕”');
+        return;
+      }
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      document.getElementById('btn-install').classList.add('hidden');
+    });
+
+    document.getElementById('btn-share').addEventListener('click', async () => {
+      const url = window.location.href;
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('页面链接已复制');
+      } catch (_) {
+        showToast(url);
+      }
+    });
+
+    async function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      try {
+        await navigator.serviceWorker.register('./sw.js');
+      } catch (error) {
+        console.error('Service Worker 注册失败', error);
+      }
+    }
+
+    function startPolling() {
+      stopPolling();
+      pollOnce(false);
+      pollingTimer = setInterval(() => pollOnce(false), POLL_INTERVAL_MS);
+    }
+
+    function stopPolling() {
+      if (pollingTimer) {
+        clearInterval(pollingTimer);
+        pollingTimer = null;
+      }
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById('toast');
+      toast.innerText = text;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+    }
+
+    function setBusy(flag) {
+      sending = flag;
+      document.getElementById('btn-on').disabled = flag;
+      document.getElementById('btn-off').disabled = flag;
+      document.getElementById('btn-refresh').disabled = flag;
+    }
+
+    function normalizeRelayState(msg) {
+      if (typeof msg !== 'string') return null;
+      const value = msg.trim().toLowerCase();
+      if (["on", "1", "open"].includes(value)) return true;
+      if (["off", "0", "close"].includes(value)) return false;
+      return null;
+    }
+
+    function renderStatus(data) {
+      const online = data?.online === true;
+      const msg = typeof data?.msg === 'string' ? data.msg : '--';
+      const timeText = data?.time || '--';
+      const relay = normalizeRelayState(msg);
+
+      const lamp = document.getElementById('conn-lamp');
+      const relayText = document.getElementById('relay-state');
+      const connText = document.getElementById('conn-text');
+      const detailOnline = document.getElementById('detail-online');
+      const detailMsg = document.getElementById('detail-msg');
+      const detailTime = document.getElementById('detail-time');
+
+      lamp.classList.toggle('online', online);
+      detailOnline.innerText = online ? '在线' : '离线';
+      detailMsg.innerText = msg || '--';
+      detailTime.innerText = timeText;
+
+      if (relay === true) {
+        relayText.innerText = '已开启';
+        relayText.className = 'relay-state on';
+        connText.innerText = timeText ? `设备在线，最近一次上报为 ON · ${timeText}` : '设备在线，最近一次上报为 ON';
+      } else if (relay === false) {
+        relayText.innerText = '已关闭';
+        relayText.className = 'relay-state off';
+        connText.innerText = timeText ? `设备在线，最近一次上报为 OFF · ${timeText}` : '设备在线，最近一次上报为 OFF';
+      } else {
+        relayText.innerText = online ? '在线未识别' : '设备离线';
+        relayText.className = 'relay-state off';
+        connText.innerText = online ? `设备在线，但云端消息不是 on/off：${msg}` : '设备离线或暂无云端消息';
+      }
+    }
+
+    async function pollOnce(showHint) {
+      try {
+        const response = await fetch(API_INFO, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const result = await response.json();
+        if (result.code !== 0 || !result.data) throw new Error(result.msg || '巴法云返回异常');
+
+        renderStatus(result.data);
+        if (showHint) showToast('状态已刷新');
+      } catch (error) {
+        console.error('状态拉取失败', error);
+        document.getElementById('conn-lamp').classList.remove('online');
+        document.getElementById('relay-state').innerText = '接口异常';
+        document.getElementById('relay-state').className = 'relay-state off';
+        document.getElementById('conn-text').innerText = '无法读取巴法云状态，请检查网络、UID、Topic 或 type 参数。';
+        if (showHint) showToast('刷新失败，请看控制台错误');
+      }
+    }
+
+    async function sendCommand(cmd) {
+      if (sending) return;
+      setBusy(true);
+      try {
+        const response = await fetch(`${API_SEND}&msg=${encodeURIComponent(cmd)}`, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const result = await response.json();
+        if (result.code !== 0) throw new Error(result.msg || '巴法云发送失败');
+
+        document.getElementById('last-action').innerText = `已发送命令：${cmd.toUpperCase()}，等待设备订阅 switch006 后执行。`;
+        showToast(`命令 ${cmd.toUpperCase()} 已发送`);
+        setTimeout(() => pollOnce(false), 700);
+      } catch (error) {
+        console.error('命令发送失败', error);
+        showToast('命令发送失败，请检查配置');
+      } finally {
+        setBusy(false);
+      }
+    }
+  </script>
+</body>
+</html>
